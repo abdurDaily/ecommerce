@@ -36,7 +36,7 @@ class CategoryController extends Controller
 
     // CATEGORY LIST 
     public function categoryList(){
-      $categorys = Category::get();
+      $categorys = Category::latest()->get();
       return view('backend.category.CategoryList', compact('categorys'));
     }
 
