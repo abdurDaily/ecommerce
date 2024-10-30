@@ -21,13 +21,31 @@ class CategoryController extends Controller
         // Validate the request
         $request->validate([
             'category_name' => 'required|unique:categories,category_name|string|max:30',
+            'category_image' => 'nullable|image|mimes:jpeg,svg,png,jpg,gif|max:2048', // .png,.jpg,.webp,.jpeg,.svg,.gif
         ]);
+
+
 
         // Create a new category
         $category = new Category();
+
         $category->category_name = $request->category_name; // Adjust based on your column name
         $category->category_slug = Str::slug($request->category_name); // Adjust based on your column name
         $category->save();
+
+
+
+        // Handle image upload
+        if($request->hasFile('category_image')){
+            $category_image = $request->category_image->extension();
+            $category_image_name  = 'category-' . time().'.'.$category_image;
+            $store_image = $request->category_image->storeAs("categoty", $category_image_name, 'public');
+            $path_image = env('APP_URL').'/storage/'.$store_image;
+            $category->category_image = $path_image;
+            $category->save();
+        }
+
+        
 
         // Return a JSON response
         return response()->json(['message' => 'Category created successfully!'], 201);
@@ -53,23 +71,34 @@ class CategoryController extends Controller
 
     // CategoryController.php
     public function update(Request $request)
-        {
-            $request->validate([
-                'id' => 'required|integer|exists:categories,id',
-                'category_name' => 'required|string|max:255',
-            ]);
+{
+    $request->validate([
+        'id' => 'required|exists:categories,id',
+        'category_name' => 'required|string|max:255',
+        'category_image' => 'nullable|image|mimes:png,jpg,jpeg,webp,gif|max:2048', // Validate the image
+    ]);
 
-            $category = Category::find($request->id);
-            $category->category_name = $request->category_name; // Store the actual name
-            $category->category_slug = Str::slug($request->category_name); // Create and store the slug
-            $category->save();
+    $category = Category::find($request->id);
+    $category->category_name = $request->category_name;
 
-            return response()->json(['success' => true]);
-        }
+    // Handle image upload
+    if ($request->hasFile('category_image')) {
+        // Store the image and get the path
+        $path = $request->file('category_image')->store('images/categories', 'public');
+        $category->category_image = '/storage/' . $path; // Save the path to the database
+    }
+
+    $category->save();
+
+    return response()->json([
+        'success' => true,
+        'category' => $category // Return the updated category data
+    ]);
+}
 
 
 
-
+        // delete 
         public function delete(Request $request)
             {
                 $request->validate([

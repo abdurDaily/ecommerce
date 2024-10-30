@@ -36,7 +36,7 @@
                 <div class="card">
                     <div class="card-body p-4">
                         <h5 class="mb-4">Vertical Form</h5>
-                        <form id="create_category" class="row g-3" action="{{ route('category.store') }}" method="post">
+                        <form id="create_category" class="row g-3" action="{{ route('category.store') }}" enctype="multipart/form-data" method="post">
                             @csrf
                             <div class="col-md-12">
                                 <label for="input1" class="form-label">Category Name</label>
@@ -44,10 +44,16 @@
                                 @error('category_name')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
+                                <label for="category_image" style="text-align: center; margin:20px 0; cursor:pointer;">
+                                    <img id="preview_image" style="width: 35%; height:35%; display: none; border-radius:50%;" src="" alt="">
+                                    <img id="add_image" style="width: 35%;" src="{{ asset('images/add.png') }}" alt="">
+                                </label>
+                                <input name="category_image" accept=".png,.jpg,.webp,.jpeg,.svg,.gif" type="file" id="category_image" class="d-none">
+                                
                             </div>
                             
                             <div class="col-md-12">
-                                <div class="d-md-flex d-grid align-items-center gap-3">
+                                <div class="d-md-flex d-grid justify-content-center align-items-center gap-3">
                                     <button type="submit" class="btn btn-primary px-4">Submit</button>
                                     <button type="reset" class="btn btn-light px-4">Reset</button>
                                 </div>
@@ -75,42 +81,68 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-toast-plugin/1.3.2/jquery.toast.min.js"></script>
 <script>
     $(function() {
-        $("#create_category").on('submit', function(e) {
-            e.preventDefault(); // Prevent the default form submission
+    $("#create_category").on('submit', function(e) {
+        e.preventDefault(); // Prevent the default form submission
 
-            // Use AJAX to submit the form
-            $.ajax({
-                url: $(this).attr('action'), // Get the action URL from the form
-                type: 'POST',
-                data: $(this).serialize(), // Serialize the form data
-                success: function(response) {
-                    // Show success alert
-                    $.toast({
-                        heading: 'Success',
-                        text: 'Data uploaded successfully!',
-                        position: 'top-center',
-                        stack: false,
-                        icon: 'success' // You can specify an icon if needed
-                    });
-                    // Optionally, reset the form
-                    $('#create_category')[0].reset();
-                },
-                error: function(xhr) {
-                    // Handle errors if needed
-                    let errorMessage = 'There was an error uploading the data.';
-                    if (xhr.responseJSON && xhr.responseJSON.message) {
-                        errorMessage = xhr.responseJSON.message; // Get error message from response
-                    }
-                    $.toast({
-                        heading: 'Error',
-                        text: errorMessage,
-                        position: 'top-center',
-                        stack: false,
-                        icon: 'error'
-                    });
+        // Create a FormData object to hold the form data
+        var formData = new FormData(this);
+
+        // Use AJAX to submit the form
+        $.ajax({
+            url: $(this).attr('action'), // Get the action URL from the form
+            type: 'POST',
+            data: formData, // Send the FormData object
+            contentType: false, // Tell jQuery not to set contentType
+            processData: false, // Tell jQuery not to process the data
+            success: function(response) {
+                // Show success alert
+                $.toast({
+                    heading: 'Success',
+                    text: 'Data uploaded successfully!',
+                    position: 'top-center',
+                    stack: false,
+                    icon: 'success' // You can specify an icon if needed
+                });
+                // Optionally, reset the form
+                $('#create_category')[0].reset();
+                // Optionally, hide the preview image
+                $('#preview_image').hide();
+                $('#add_image').show(); // Show the add image again
+            },
+            error: function(xhr) {
+                // Handle errors if needed
+                let errorMessage = 'There was an error uploading the data.';
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    errorMessage = xhr.responseJSON.message; // Get error message from response
                 }
-            });
+                $.toast({
+                    heading: 'Error',
+                    text: errorMessage,
+                    position: 'top-center',
+                    stack: false,
+                    icon: 'error'
+                });
+            }
         });
     });
+});
+
+
+    // image preview 
+    $(document).ready(function() {
+    $('#category_image').change(function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                // Hide the add image and show the selected image
+                $('#add_image').hide();
+                $('#preview_image').attr('src', e.target.result).show();
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+});
+
 </script>
 @endpush
