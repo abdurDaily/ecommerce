@@ -1,5 +1,26 @@
 @extends('backend.Layout')
 @section('backend_contents')
+@push('backend_css')
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+
+<style>
+    .select2-container{
+        width: 100% !important;
+    }
+    
+   .select2-container--default .select2-selection--single {
+        background-color: #ffffff;
+        border: 1px solid #aaa;
+        border-radius: 4px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+     }
+     .select2-container--default .select2-selection--single .select2-selection__placeholder {
+        line-height: 45px;
+     }
+</style>
+@endpush
 
 <div class="page-wrapper">
     <div class="page-content">
@@ -35,7 +56,7 @@
             <div class="col-xl-4">
                 <div class="card">
                     <div class="card-body p-4">
-                        <h5 class="mb-4">Vertical Form</h5>
+                        <h5 class="mb-4">Category Create</h5>
                         <form id="create_category" class="row g-3" action="{{ route('category.store') }}" enctype="multipart/form-data" method="post">
                             @csrf
                             <div class="col-md-12">
@@ -44,10 +65,12 @@
                                 @error('category_name')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
-                                <label for="category_image" style="text-align: center; margin:20px 0; cursor:pointer;">
-                                    <img id="preview_image" style="width: 35%; height:35%; display: none; border-radius:50%;" src="" alt="">
-                                    <img id="add_image" style="width: 35%;" src="{{ asset('images/add.png') }}" alt="">
-                                </label>
+                                <div class="category_img text-center">
+                                    <label for="category_image" style="text-align: center; margin:20px 0; cursor:pointer;">
+                                        <img id="preview_image" style="width: 35%; height:35%; display: none; border-radius:50%;" src="" alt="">
+                                        <img id="add_image" style="width: 35%;" src="{{ asset('images/add.png') }}" alt="">
+                                    </label>
+                                </div>
                                 <input name="category_image" accept=".png,.jpg,.webp,.jpeg,.svg,.gif" type="file" id="category_image" class="d-none">
                                 
                             </div>
@@ -65,7 +88,52 @@
 
 
             <div class="col-xl-8">
-                <h1>ok</h1>
+                <div class="card">
+                    <div class="card-body p-4">
+                        <h5 class="mb-4">Subcategory Create</h5>
+                        <form id="create_category" class="row g-3 justify-content-lg-between" action="" enctype="multipart/form-data" method="post">
+                            @csrf
+                            <div class="col-md-7">
+                                <label for="category_select" class="form-label">Select a category</label>
+                                <select name="category_id" id="category_select" class="form-control select_category">
+                                    <option value="" selected disabled>Select a category</option>
+                                    <option value="1">Option 1</option>
+                                    <option value="2">Option 2</option>
+                                    <option value="3">Option 3</option>
+                                    <option value="4">Option 4</option>
+                                    <option value="5">Option 5</option>
+                                    <option value="6">Option 6</option>
+                                    <option value="7">Option 7</option>
+                                    <option value="8">Option 8</option>
+                                </select>
+                            
+                                <label for="input1" class="form-label mt-3">Subcategory Name</label>
+                                <input name="category_name" type="text" class="form-control" id="input1" placeholder="Category Name">
+                                @error('category_name')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+                            
+                            <div class="col-md-4">
+
+                                <div class="sub_category_img text-center">
+                                    <label for="category_image" style="text-align: center; margin:20px 0; cursor:pointer;">
+                                        <img id="preview_image" style="width: 35%; height:35%; display: none; border-radius:50%;" src="" alt="">
+                                        <img id="add_image" style="width: 50%;" src="{{ asset('images/add.png') }}" alt="">
+                                    </label>
+                                    <input name="category_image" accept=".png,.jpg,.webp,.jpeg,.svg,.gif" type="file" id="category_image" class="d-none">
+                                    
+                                </div>
+
+
+                                <div class="d-md-flex d-grid justify-content-center align-items-center gap-3">
+                                    <button type="submit" class="btn btn-primary px-4">Submit</button>
+                                    <button type="reset" class="btn btn-light px-4">Reset</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
         <!--end row-->
@@ -144,5 +212,25 @@
     });
 });
 
+
+
+
+
+
+</script>
+@endpush
+
+
+@push('backend_js')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // Initialize Select2 on the select element
+        $(".select_category").select2({
+            placeholder: "Select a category", // Placeholder text
+            allowClear: true // Allow clearing the selection
+        });
+    });
 </script>
 @endpush
