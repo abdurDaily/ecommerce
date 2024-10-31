@@ -55,7 +55,7 @@ class CategoryController extends Controller
 
     // CATEGORY LIST 
     public function categoryList(){
-      $categorys = Category::latest()->get();
+      $categorys = Category::latest()->simplepaginate(10);
       return view('backend.category.CategoryList', compact('categorys'));
     }
 

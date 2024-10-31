@@ -77,7 +77,7 @@
                             <tbody>
                                 @forelse ($categorys as $key => $category)
                                     <tr>
-                                        <td>{{ ++$key }}</td>
+                                        <td>{{ $categorys->firstItem() + $key }}</td>
                                         <td>{{ $category->category_name }}</td> <!-- Display category name -->
                                         <td style="text-align: center">
                                             <img class="category-image" style="width: 50px;"
@@ -116,6 +116,8 @@
                             </tbody>
 
                         </table>
+
+                        {{ $categorys->links() }}
                     </div>
                 </div>
             </div>
@@ -166,6 +168,10 @@
 
 
 @push('backend_js')
+
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function() {
@@ -383,6 +389,3 @@
 @endpush
 
 
-@push('backend_js')
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
-@endpush
