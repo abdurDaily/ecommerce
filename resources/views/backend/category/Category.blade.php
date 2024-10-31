@@ -56,7 +56,7 @@
             </div>
             <!--end breadcrumb-->
             <div class="row">
-                <div class="col-xl-4">
+                <div class="col-xl-6 mx-auto">
                     <div class="card">
                         <div class="card-body p-4">
                             <h5 class="mb-4">Category Create</h5>
@@ -65,12 +65,23 @@
                                 @csrf
                                 <div class="col-md-12">
                                     <label for="input1" class="form-label">Category Name</label>
-                                    <input name="category_name" type="text" class="form-control" id="input1"
+                                    <input name="category_name" type="text" class="form-control mb-3" id="input1"
                                         placeholder="Category Name">
                                     @error('category_name')
                                         <span class="text-danger">{{ $message }}</span>
                                     @enderror
-                                    <div class="category_img text-center">
+
+                                    <label for="category_select" class="form-label">Select Category </label>
+                                    <select name="category_id" id="category_select" class="form-control select_category">
+                                        <option value="" selected disabled>Select a category</option>
+                                        @foreach ($categories as $categorie)
+                                            <option value="{{ $categorie->id }}">{{ $categorie->category_name }}</option>
+                                        @endforeach
+                                    </select>
+
+
+
+                                    <div class="category_img text-center mt-3">
                                         <label for="category_image"
                                             style="text-align: center; margin:20px 0; cursor:pointer;">
                                             <img id="preview_image"
@@ -80,6 +91,12 @@
                                                 alt="">
                                         </label>
                                     </div>
+
+
+
+
+
+
                                     <input name="category_image" accept=".png,.jpg,.webp,.jpeg,.svg,.gif" type="file"
                                         id="category_image" class="d-none">
 
@@ -87,8 +104,7 @@
 
                                 <div class="col-md-12">
                                     <div class="d-md-flex d-grid justify-content-center align-items-center gap-3">
-                                        <button type="submit" class="btn btn-primary px-4">Submit</button>
-                                        <button type="reset" class="btn btn-light px-4">Reset</button>
+                                        <button type="submit" class="w-100 btn btn-primary px-4">Submit</button>
                                     </div>
                                 </div>
                             </form>
@@ -96,57 +112,6 @@
                     </div>
                 </div>
 
-
-                <div class="col-xl-8">
-                    <div class="card">
-                        <div class="card-body p-4">
-                            <h5 class="mb-4">Subcategory Create</h5>
-
-                            <form id="create_sub_category" class="row g-3 justify-content-lg-between" action=""
-                                enctype="multipart/form-data" method="post">
-                                @csrf
-                                <div class="col-md-7">
-                                    <label for="category_select" class="form-label">Select a category</label>
-                                    <select name="category_id" id="category_select" class="form-control select_category">
-                                        <option value="" selected disabled>Select a category</option>
-                                        @foreach ($categories as $categorie)
-                                            <option value="{{ $categorie->id }}">{{ $categorie->category_name }}</option>
-                                        @endforeach
-                                    </select>
-
-                                    <label for="input1" class="form-label mt-3">Subcategory Name</label>
-                                    <input name="category_name" type="text" class="form-control" id="input1"
-                                        placeholder="Category Name">
-                                    @error('category_name')
-                                        <span class="text-danger">{{ $message }}</span>
-                                    @enderror
-                                </div>
-
-                                <div class="col-md-4">
-                                    <div class="sub_category_img text-center">
-                                        <label for="subcategory_image"
-                                            style="text-align: center; margin:20px 0; cursor:pointer;">
-                                            <img id="preview_subcategory_image"
-                                                style="width: 35%; height:35%; display: none; border-radius:50%;"
-                                                src="" alt="">
-                                            <img id="add_image_subcategory" style="width: 50%;"
-                                                src="{{ asset('images/add.png') }}" alt="">
-                                        </label>
-                                        <input name="subcategory_image" accept=".png,.jpg,.webp,.jpeg,.svg,.gif"
-                                            type="file" id="subcategory_image" class="d-none">
-                                    </div>
-
-                                    <div class="d-md-flex d-grid justify-content-center align-items-center gap-3">
-                                        <button type="submit" class="btn btn-primary px-4">Submit</button>
-                                        <button type="reset" class="btn btn-light px-4">Reset</button>
-                                    </div>
-                                </div>
-                            </form>
-
-
-                        </div>
-                    </div>
-                </div>
             </div>
             <!--end row-->
         </div>
@@ -161,6 +126,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-toast-plugin/1.3.2/jquery.toast.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
     <script>
+        //INITIAL CATEGORY NAME INSERT 
         $(document).ready(function() {
             // Function to handle form submission
             function handleFormSubmission(formId) {
@@ -197,7 +163,7 @@
                             let errorMessage = 'There was an error uploading the data.';
                             if (xhr.responseJSON && xhr.responseJSON.message) {
                                 errorMessage = xhr.responseJSON
-                                .message; // Get error message from response
+                                    .message; // Get error message from response
                             }
                             $.toast({
                                 heading: 'Error',
@@ -231,6 +197,7 @@
         });
 
 
+        //CATEGORY IMAGE PREVIEW 
         $(document).ready(function() {
             // Function to handle image preview
             function handleImagePreview(inputSelector, previewSelector, addImageSelector) {
@@ -252,81 +219,14 @@
             handleImagePreview('#category_image', '#preview_category_image', '#add_image_category');
             handleImagePreview('#subcategory_image', '#preview_subcategory_image', '#add_image_subcategory');
         });
-    </script>
-@endpush
 
 
-@push('backend_js')
-    <script>
+        //SELECT OPTION FOR SELECTING PARENT CATEGORY 
         $(document).ready(function() {
             // Initialize Select2 on the select element
             $(".select_category").select2({
                 placeholder: "Select a category", // Placeholder text
                 allowClear: true // Allow clearing the selection
-            });
-        });
-    </script>
-
-
-
-
-
-
-
-
-
-    <script>
-        $(document).ready(function() {
-            $("#create_sub_category").on('submit', function(e) {
-                e.preventDefault(); // Prevent the default form submission
-
-                // Create a FormData object to hold the form data
-                var formData = new FormData(this);
-
-                $.ajax({
-                    type: "POST",
-                    url: `{{ route('sub.category.store') }}`, // Use the correct route for storing subcategories
-                    data: formData,
-                    contentType: false, // Prevent jQuery from overriding content type
-                    processData: false, // Prevent jQuery from processing the data
-                    success: function(response) {
-                        $.toast({
-                            heading: 'Success',
-                            text: 'subcategory uploaded successfully!',
-                            position: 'top-center',
-                            stack: false,
-                            icon: 'success'
-                        });
-                        // Optionally, you can reset the form here or redirect the user
-                        $('#create_sub_category')[0].reset(); // Reset the form
-                        $('#preview_subcategory_image').hide(); // Hide the preview image
-                        $('#add_image_subcategory').show(); // Hide the preview image
-                        $('#category_select').val(null).trigger('change');
-                    },
-                    error: function(xhr) {
-                        console.error(xhr);
-                        $.toast({
-                            heading: 'Error',
-                            text: 'There was an error creating the subcategory. Please try again.',
-                            position: 'top-center',
-                            stack: false,
-                            icon: 'error'
-                        });
-                    }
-                });
-            });
-
-            // Preview the selected image
-            $("#subcategory_image").on('change', function() {
-                const file = this.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        $('#preview_subcategory_image').attr('src', e.target.result).show();
-                        $('#add_image_subcategory').hide(); // Hide the add image icon
-                    }
-                    reader.readAsDataURL(file);
-                }
             });
         });
     </script>
