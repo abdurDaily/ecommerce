@@ -12,7 +12,8 @@ class CategoryController extends Controller
     //CREATE CATEGORY 
     public function createCategory()
     {
-        return view('backend.category.Category');
+        $categories = Category::select('id','category_name')->get();
+        return view('backend.category.Category', compact('categories'));
     }
 
     //STORE CATEGORY 
