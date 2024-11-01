@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Backend\Category;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\Backend\Category;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 
 class CategoryController extends Controller
@@ -24,40 +25,57 @@ class CategoryController extends Controller
             'category_name' => 'required|unique:categories,category_name|string|max:30',
             'category_image' => 'nullable|image|mimes:jpeg,svg,png,jpg,gif|max:2048', // .png,.jpg,.webp,.jpeg,.svg,.gif
         ]);
-
-
-
+    
         // Create a new category
         $category = new Category();
-
         $category->category_name = $request->category_name; // Adjust based on your column name
         $category->category_slug = Str::slug($request->category_name); // Adjust based on your column name
+        
+        $category->category_id = $request->category_id;
         $category->save();
-
-
-
+    
         // Handle image upload
-        if($request->hasFile('category_image')){
+        if ($request->hasFile('category_image')) {
             $category_image = $request->category_image->extension();
-            $category_image_name  = 'category-' . time().'.'.$category_image;
-            $store_image = $request->category_image->storeAs("categoty", $category_image_name, 'public');
-            $path_image = env('APP_URL').'/storage/'.$store_image;
+            $category_image_name  = 'category-' . time() . '.' . $category_image;
+            $store_image = $request->category_image->storeAs("category", $category_image_name, 'public'); // Fix typo "categoty" to "category"
+            $path_image = env('APP_URL') . '/storage/' . $store_image;
             $category->category_image = $path_image;
             $category->save();
         }
-
-        
-
-        // Return a JSON response
-        return response()->json(['message' => 'Category created successfully!'], 201);
+    
+        // Return a JSON response with the newly created category data
+        return response()->json([
+            'message' => 'Category created successfully!',
+            'id' => $category->id,
+            'category_name' => $category->category_name,
+        ], 201);
     }
-
 
     // CATEGORY LIST 
     public function categoryList(){
       $categorys = Category::latest()->simplepaginate(10);
-      return view('backend.category.CategoryList', compact('categorys'));
+    //   $subCategories = Category::whereColumn('id', 'category_id')->get();
+    //   dd($subCategories);
+
+    $categories = Category::all();
+
+    // Prepare a collection to hold category data with relationships
+    $categoriesWithRelationships = $categories->map(function ($category) use ($categories) {
+        return [
+            'id' => $category->id,                                                                                                  
+            'category_id' => $category->category_id,
+            'has_children' => $categories->where('category_id', $category->id)->count() > 0,
+            'children' => $categories->where('category_id', $category->id),
+        ];
+    });
+    // dd($categoriesWithRelationships);
+
+
+      return view('backend.category.CategoryList', compact('categorys','categoriesWithRelationships'));
     }
+
+    
 
 
     // CATEGORY STATUS UPDATE

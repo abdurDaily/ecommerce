@@ -67,6 +67,7 @@
                                 <tr>
                                     <th>#</th>
                                     <th>Category Name</th>
+                                    <th>Sub Category </th>
                                     <th>Image</th>
                                     <th>Create</th>
                                     <th>Update</th>
@@ -79,11 +80,25 @@
                                     <tr>
                                         <td>{{ $categorys->firstItem() + $key }}</td>
                                         <td>{{ $category->category_name }}</td> <!-- Display category name -->
+                                        <td>
+                                            @php
+                                                $categoryRelationship = $categoriesWithRelationships->where('id', $category->id)->first();
+                                            @endphp
+                                            @if($categoryRelationship && $categoryRelationship['has_children'])
+                                                <ul>
+                                                    @foreach($categoryRelationship['children'] as $child)
+                                                        <li>{{ $child->category_name }}</li> <!-- Display child category name -->
+                                                    @endforeach
+                                                </ul>
+                                            @else
+                                                <span>No Subcategories</span>
+                                            @endif
+                                        </td> <!-- Display subcategory information -->
                                         <td style="text-align: center">
                                             <img class="category-image" style="width: 50px;"
                                                 src="{{ $category->category_image ? $category->category_image : asset('images/alert.png') }}"
                                                 alt="">
-                                        </td> <!-- Display category slug -->
+                                        </td> <!-- Display category image -->
                                         <td>{{ $category->created_at->format('d M Y') }}</td>
                                         <td>{{ $category->updated_at->format('d M Y') }}</td>
                                         <td>
@@ -92,8 +107,7 @@
                                                     id="flexSwitchCheckChecked"
                                                     {{ $category->status === 1 ? 'checked' : '' }}
                                                     data-id="{{ $category->id }}">
-                                                <span
-                                                    class="active_status">{{ $category->status === 1 ? 'active' : 'pending' }}</span>
+                                                <span class="active_status">{{ $category->status === 1 ? 'active' : 'pending' }}</span>
                                             </div>
                                         </td>
                                         <td style="text-align: center">
@@ -108,11 +122,9 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="7" align="center" style="color: red">No Data Available !</td>
+                                        <td colspan="8" align="center" style="color: red">No Data Available!</td>
                                     </tr>
                                 @endforelse
-
-                                <!-- Add more rows as needed -->
                             </tbody>
 
                         </table>

@@ -126,7 +126,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-toast-plugin/1.3.2/jquery.toast.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
     <script>
-        //INITIAL CATEGORY NAME INSERT 
+        // INITIAL CATEGORY NAME INSERT 
         $(document).ready(function() {
             // Function to handle form submission
             function handleFormSubmission(formId) {
@@ -152,6 +152,10 @@
                                 stack: false,
                                 icon: 'success'
                             });
+
+                            // Append the new category to the select options
+                            $('#category_select').append(new Option(response.category_name, response.id));
+
                             // Optionally, reset the form
                             $(formId)[0].reset();
                             // Optionally, hide the preview image
@@ -162,8 +166,7 @@
                             // Handle errors if needed
                             let errorMessage = 'There was an error uploading the data.';
                             if (xhr.responseJSON && xhr.responseJSON.message) {
-                                errorMessage = xhr.responseJSON
-                                    .message; // Get error message from response
+                                errorMessage = xhr.responseJSON.message; // Get error message from response
                             }
                             $.toast({
                                 heading: 'Error',
@@ -179,7 +182,8 @@
 
             // Handle form submissions for both forms
             handleFormSubmission('#create_category');
-            handleFormSubmission('#create_subcategory');
+            // If you have another form for subcategories, you can handle it similarly
+            // handleFormSubmission('#create_subcategory');
 
             // Image preview functionality
             $('#category_image').change(function(event) {
@@ -196,32 +200,7 @@
             });
         });
 
-
-        //CATEGORY IMAGE PREVIEW 
-        $(document).ready(function() {
-            // Function to handle image preview
-            function handleImagePreview(inputSelector, previewSelector, addImageSelector) {
-                $(inputSelector).change(function(event) {
-                    const file = event.target.files[0];
-                    if (file) {
-                        const reader = new FileReader();
-                        reader.onload = function(e) {
-                            // Hide the add image and show the selected image
-                            $(addImageSelector).hide();
-                            $(previewSelector).attr('src', e.target.result).show();
-                        };
-                        reader.readAsDataURL(file);
-                    }
-                });
-            }
-
-            // Call the function for both category and subcategory image inputs
-            handleImagePreview('#category_image', '#preview_category_image', '#add_image_category');
-            handleImagePreview('#subcategory_image', '#preview_subcategory_image', '#add_image_subcategory');
-        });
-
-
-        //SELECT OPTION FOR SELECTING PARENT CATEGORY 
+        // SELECT OPTION FOR SELECTING PARENT CATEGORY 
         $(document).ready(function() {
             // Initialize Select2 on the select element
             $(".select_category").select2({
@@ -230,4 +209,4 @@
             });
         });
     </script>
-@endpush
+@endpush            
