@@ -25,24 +25,24 @@ class CategoryController extends Controller
             'category_name' => 'required|unique:categories,category_name|string|max:30',
             'category_image' => 'nullable|image|mimes:jpeg,svg,png,jpg,gif|max:2048', // .png,.jpg,.webp,.jpeg,.svg,.gif
         ]);
-    
+            // dd($request->all());
         // Create a new category
         $category = new Category();
         $category->category_name = $request->category_name; // Adjust based on your column name
         $category->category_slug = Str::slug($request->category_name); // Adjust based on your column name
         
         $category->category_id = $request->category_id;
-        $category->save();
-    
-        // Handle image upload
         if ($request->hasFile('category_image')) {
             $category_image = $request->category_image->extension();
             $category_image_name  = 'category-' . time() . '.' . $category_image;
             $store_image = $request->category_image->storeAs("category", $category_image_name, 'public'); // Fix typo "categoty" to "category"
             $path_image = env('APP_URL') . '/storage/' . $store_image;
             $category->category_image = $path_image;
-            $category->save();
         }
+        $category->save();
+        
+        // Handle image upload
+        
     
         // Return a JSON response with the newly created category data
         return response()->json([
@@ -72,7 +72,7 @@ class CategoryController extends Controller
     // dd($categoriesWithRelationships);
 
 
-      return view('backend.category.CategoryList', compact('categorys','categoriesWithRelationships'));
+      return view('backend.category.CategoryList', compact('categories','categorys','categoriesWithRelationships'));
     }
 
     
@@ -129,4 +129,36 @@ class CategoryController extends Controller
 
                 return response()->json(['success' => true]);
             }
+
+
+
+
+
+            // DELETE SUB-CATEGORY
+            public function destroy(Request $request)
+    {
+        // Validate the request to ensure an ID is provided
+        $request->validate([
+            'id' => 'required|exists:categories,id',
+        ]);
+
+        // Find the sub-category by ID
+        $subCategory = Category::find($request->input('id'));
+
+        // Check if the sub-category exists and has a parent category
+        if ($subCategory && $subCategory->category_id !== null) {
+            // Delete the sub-category
+            $subCategory->delete();
+
+            return response()->json(['success' => true, 'message' => 'Sub-category deleted successfully.']);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Sub-category not found or is not a sub-category.']);
+    }
 }
+
+
+
+
+
+

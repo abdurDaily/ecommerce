@@ -13,6 +13,7 @@ Route::middleware('auth')->prefix('category/')->name('category.')->group(functio
     Route::post('/category/status/update', [CategoryController::class, 'updateStatus'])->name('category.status.update');
     Route::post('/category/update', [CategoryController::class, 'update'])->name('category.update');
     Route::post('update', [CategoryController::class, 'delete'])->name('delete');
+    Route::post('destroy', [CategoryController::class, 'destroy'])->name('destroy');
 });
 
 

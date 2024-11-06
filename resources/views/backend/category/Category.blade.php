@@ -59,19 +59,19 @@
                 <div class="col-xl-6 mx-auto">
                     <div class="card">
                         <div class="card-body p-4">
-                            <h5 class="mb-4">Category Create</h5>
+                            <h5 class="mb-4">Create One</h5>
                             <form id="create_category" class="row g-3" action="{{ route('category.store') }}"
                                 enctype="multipart/form-data" method="post">
                                 @csrf
                                 <div class="col-md-12">
-                                    <label for="input1" class="form-label">Category Name</label>
+                                    <label for="input1" class="form-label">sub category</label>
                                     <input name="category_name" type="text" class="form-control mb-3" id="input1"
                                         placeholder="Category Name">
                                     @error('category_name')
                                         <span class="text-danger">{{ $message }}</span>
                                     @enderror
 
-                                    <label for="category_select" class="form-label">Select Category </label>
+                                    <label for="category_select" class="form-label"> Category </label>
                                     <select name="category_id" id="category_select" class="form-control select_category">
                                         <option value="" selected disabled>Select a category</option>
                                         @foreach ($categories as $categorie)

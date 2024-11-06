@@ -1,9 +1,6 @@
 @extends('backend.Layout')
 
-@push('backend_css')
-    <!-- Include SweetAlert2 CSS and JS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-@endpush
+
 @section('backend_contents')
     <!--start page wrapper -->
     <div class="page-wrapper">
@@ -87,8 +84,13 @@
                                             @if($categoryRelationship && $categoryRelationship['has_children'])
                                                 <ul>
                                                     @foreach($categoryRelationship['children'] as $child)
-                                                        <li>{{ $child->category_name }}</li> <!-- Display child category name -->
-                                                    @endforeach
+    <li>
+        {{ $child->category_name }} 
+        <a href="#" class="delete-subcategory" data-id="{{ $child->id }}">
+            <span><i class="lni lni-trash"></i></span>
+        </a>
+    </li>
+@endforeach
                                                 </ul>
                                             @else
                                                 <span>No Subcategories</span>
@@ -178,13 +180,16 @@
 @endsection
 
 
+@push('backend_css')
+    <!-- Include SweetAlert2 CSS and JS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+@endpush
+
 
 @push('backend_js')
 
-
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function() {
             $('.form-check-input').change(function() {
@@ -397,6 +402,66 @@
                 });
             });
         });
+
+
+
+
+        // delete sub category 
+        
+        $(document).ready(function() {
+    // Delete sub-category
+    $('.delete-subcategory').click(function(e) {
+        e.preventDefault();
+        var subCategoryId = $(this).data('id'); // Get the subcategory ID from the data attribute
+
+        // SweetAlert confirmation
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: `{{ route('category.destroy') }}`, // Ensure this route points to your destroy method
+                    type: 'POST',
+                    data: {
+                        id: subCategoryId,
+                        _token: '{{ csrf_token() }}' // Include CSRF token
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            // Remove the sub-category from the list
+                            $('a.delete-subcategory[data-id="' + subCategoryId + '"]').closest('li').remove();
+                            Swal.fire(
+                                'Deleted!',
+                                'Your sub-category has been deleted.',
+                                'success'
+                            );
+                        } else {
+                            Swal.fire(
+                                'Error!',
+                                response.message || 'Failed to delete the sub-category. Please try again.',
+                                'error'
+                            );
+                        }
+                    },
+                    error: function(xhr) {
+                        console.log(xhr.responseText); // Handle error
+                        Swal.fire(
+                            'Error!',
+                            'An error occurred. Please try again.',
+                            'error'
+                        );
+                    }
+                });
+            }
+        });
+    });
+});
     </script>
 @endpush
 
